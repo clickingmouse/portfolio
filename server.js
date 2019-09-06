@@ -1,15 +1,19 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
+//const bodyParser = require("body-parser");
 const path = require("path");
 const app = express();
-const items = require("./routes/api/items");
+const itemsRoute = require("./routes/api/items");
+const usersRoute = require("./routes/api/users");
+const authRoute = require("./routes/api/auth");
+
 const dotenv = require("dotenv");
 
 dotenv.config();
 
 //Body parser middleware
-app.use(bodyParser.json());
+//app.use(bodyParser.json());
+app.use(express.json());
 
 //DB Config
 //const db = require("./config/keys").mongoURI;
@@ -17,12 +21,13 @@ app.use(bodyParser.json());
 const db = process.env.REACT_APP_MONGO_URI;
 //connect to mongoose
 mongoose
-  .connect(db)
+  .connect(db, { useNewUrlParser: true, useCreateIndex: true })
   .then(() => console.log("mongo connected..."))
   .catch(err => console.log(err));
 
-app.use("/api/items", items);
-
+app.use("/api/items", itemsRoute);
+app.use("/api/users", usersRoute);
+app.use("/api/auth", authRoute);
 // serve static assets if in production
 if (process.env.NODE_ENV === "production") {
   app.use(express.static("client/build"));
